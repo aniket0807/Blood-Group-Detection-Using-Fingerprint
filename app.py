@@ -11,7 +11,32 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 app = Flask(__name__)
 
-model = tf.keras.models.load_model('./model/model.h5')
+MODEL_DIR = os.path.join('.', 'model')
+MODEL_PATH = os.path.join(MODEL_DIR, 'model.h5')
+MODEL_URL = os.environ.get('MODEL_URL')
+
+if not os.path.exists(MODEL_DIR):
+    os.makedirs(MODEL_DIR)
+
+if not os.path.exists(MODEL_PATH):
+    if MODEL_URL:
+        # download model from URL into model path
+        try:
+            import requests
+            print(f'Downloading model from {MODEL_URL} to {MODEL_PATH}...')
+            with requests.get(MODEL_URL, stream=True) as r:
+                r.raise_for_status()
+                with open(MODEL_PATH, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+            print('Model downloaded successfully.')
+        except Exception as e:
+            print('Failed to download model:', e)
+    else:
+        print('No model found at', MODEL_PATH, 'and MODEL_URL not set. Loading will fail unless model is present.')
+
+model = tf.keras.models.load_model(MODEL_PATH)
 
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg','bmp'}
 
