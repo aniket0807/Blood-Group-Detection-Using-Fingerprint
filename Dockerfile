@@ -21,8 +21,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements and install
 COPY requirements-prod.txt ./
+COPY requirements-prod-legacy.txt ./
 RUN pip install --upgrade pip setuptools wheel
-RUN pip install -r requirements-prod.txt
+# If a legacy requirements file exists, prefer it (useful to load older models).
+RUN if [ -f requirements-prod-legacy.txt ]; then pip install -r requirements-prod-legacy.txt; else pip install -r requirements-prod.txt; fi
 
 # Copy rest of the app
 COPY . .

@@ -32,3 +32,10 @@ Model downloads
 ---------------
 If your `model/model.h5` is large and you prefer not to keep it in the repo, host it on a storage bucket (S3/GCS) and set a `MODEL_URL` environment variable in Render to point to the model file. The app will download the model on startup if it isn't present.
 
+Legacy TensorFlow models
+------------------------
+If your saved `.h5` model was built with an older TensorFlow/Keras version it may not deserialize under the latest TensorFlow. To handle this, a legacy requirements file `requirements-prod-legacy.txt` is supported by the Dockerfile. If that file exists the Docker build will install its pinned packages instead of `requirements-prod.txt`.
+
+For a quick fix to load older models, put `requirements-prod-legacy.txt` in the repo (it already exists in this repo) and redeploy. This will install TensorFlow 2.11 and compatible packages so your existing `.h5` model can be loaded.
+
+
